@@ -9,12 +9,7 @@ output: html_document
 library(tidyverse)
 library(p8105.datasets)
 library(patchwork)
-
-knitr::opts_chunk$set(
-  fig.width = 6,
-  fig.asp = .6,
-  out.width = "90%"
-)
+knitr::opts_chunk$set(echo = TRUE)
 
 theme_set(theme_bw() + theme(legend.position = "bottom"))
 ```
@@ -304,6 +299,37 @@ viridis::scale_color_viridis(
 Based on the two-panel plot, it is very obvious that the mean value of total average max tempertuare between Jan and July is different. The max tempertuare for Jan is lower than the max temperature for July from 1981 to 2010. Greater variability happened in Jan. Most years have outliers. For example, in 1988 July, there is a super low max temperature. All outliers in July are below the min of the max tempature, while for Jan, relatively more outliers are higher than the average. 
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+
+```{r,tmax_tmin_and_snowfall}
+library(hexbin)
+temperature= clean_ny_noaa %>% 
+  ggplot(aes(x = tmax, y = tmin)) +
+  geom_hex() +
+  labs(
+    title = " tmax vs tmin for the full dataset",
+    x = "maximum temperature (C)",
+    y = "minimum temperature (C)",
+ caption = "Data from p8105.datasets package"
+  )
+
+snowfall=clean_ny_noaa %>% 
+  filter(snow > 0 & snow < 100) %>% 
+  ggplot(aes(x = year, y = snow, fill = year)) +
+  geom_boxplot() +
+  scale_x_discrete(breaks = c(1981, 1987, 1993, 1999, 2005, 2010)) +
+    labs(
+      x = "Year",
+      y = "Snowfall (mm)",
+      title = "alues greater than 0 and less than 100 separately by year",
+       caption = "Data from p8105.datasets package"
+    )
+temperature/snowfall
+
+```
+
+Generally, tmax and tmin are positively correlated. As tmax increases, tmin increases. The mostly observed tmax is between 0 to 25 C and the mostly observed tmin is between -15 to 18 C.
+Most years have fairly simialr and constant snowfall,except 1998,2006 and 2010. Overall, the distribution of snowfall is stable, with the median of 25. 
 
 
 
