@@ -114,5 +114,57 @@ The five-panel plot shows the distribution of these state-level averages over ti
 
 ## problem 2
 
+The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations.
+
+```{r, description}
+data("instacart")
+
+instacart %>%
+  group_by(order_id) %>%
+summarize(n = n())
+
+instacart %>%
+  group_by(product_id) %>%
+summarize(n = n())
+
+instacart %>% 
+  group_by(order_id) %>% 
+  summarize( n_product = n_distinct(product_id))
+
+instacart %>%
+  group_by(user_id) %>%
+summarize(n = n())
+
+
+```
+
+This dataset has `r nrow(instacart)` rows and `r ncol(instacart)` columns. 
+Order_id provides the ID of different orders, and there are total 131209 orders.Product_id provides the ID of different products, and there are total 39123 different products. Add_to_cart_order shows order in which each product was added to cart.Reordered means that 1 if this prodcut has been ordered by this user in the past, 0 otherwise. User_id shows customer identifier.There are total 131209 users, which is same as the amount of order numbers. Order_dow: provides the day of the week on which the order was placed. Order_hour_of_day: shows the hour of the day on which the order was placed. Days_since_prior_order shows days since the last order, capped at 30, NA if order_number=1.Aisle_id provides aisle identifier and department_id provides department identifier.
+
+examples of observations
+`r head(instacart, 1) %>% knitr::kable()`
+
+This user with the id:112108 booked an order with the id :1 at 10am on Thursday. This product is Bulgarian Yogurt. Bulgarian Yogurt has been ordered by this user in the past and this is his 4th time order this.  Bulgarian Yogurt has aisle id :120, department id: 16. It belongs to yogurt aisle and dairy eggs department. 
+
+
+#### do or answer the following (commenting on the results of each):
+
+How many aisles are there, and which aisles are the most items ordered from?
+```{r, aisles}
+instacart %>%
+  group_by(aisle) %>%
+summarize(n = n()) %>%
+arrange(desc(n))
+
+
+```
+There are total 134 different kinds of aisles. Among them, fresh vegetables has the most items.
+
+Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
+
+Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
+Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
+
 
 
