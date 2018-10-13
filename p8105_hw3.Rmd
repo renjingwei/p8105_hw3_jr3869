@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(p8105.datasets)
+library(patchwork)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -66,7 +67,6 @@ ggplot(location_number, aes(x = year, y = n_location, color = locationabbr)) +
     name = "state", 
     discrete = TRUE
   ) 
-  
 ```
 
 The spaghetti plot shows the number of locations in each state from 2002 to 2010. Most states have a constant number of locations from 2002 to 2010. The number of locations has a obvious change in FL from 2006 to 2010. It first increased dramatically and then deceased sharply and finally increased back.
@@ -249,10 +249,61 @@ ny_noaa %>%
 summarize(mean_depth = mean(snwd),
           mean_prcp = mean (prcp))
 
-
+date_range = ny_noaa %>% 
+  arrange(date) 
+head(date_range)
+tail(date_range)
 ```
 This dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. 
-Key variables: id shows Weather station ID and there are total 747 different stations. Date shows Date of observation and total 10957 days are recorded.prcp means Precipitation (tenths of mm).snow is Snowfall (mm).snwd is Snow depth (mm) tmax gives Maximum temperature (tenths of degrees C). tmin gives Minimum temperature (tenths of degrees C). There are `r sum(is.na(ny_noaa$prcp))` missing values for the precipitation colummn and `r sum(is.na(ny_noaa$tmax))` missing values for tmax and `r sum(is.na(ny_noaa$tmin))` missing values for tmin. `r sum(is.na(ny_noaa$snow))` missing values for Snowfall (mm) and `r sum(is.na(ny_noaa$snwd))` missing values for  Snow depth (mm). A large extent of the data are missing and this might be an issue in the analysis of this dataset.
+Key variables: id shows Weather station ID and there are total 747 different stations. Date shows Date of observation and total 10957 days are recorded from 1981-01-01 to 2010-12-31prcp means Precipitation (tenths of mm).snow is Snowfall (mm).snwd is Snow depth (mm) tmax gives Maximum temperature (tenths of degrees C). tmin gives Minimum temperature (tenths of degrees C). There are `r sum(is.na(ny_noaa$prcp))` missing values for the precipitation colummn and `r sum(is.na(ny_noaa$tmax))` missing values for tmax and `r sum(is.na(ny_noaa$tmin))` missing values for tmin. `r sum(is.na(ny_noaa$snow))` missing values for Snowfall (mm) and `r sum(is.na(ny_noaa$snwd))` missing values for  Snow depth (mm). A large extent of the data are missing and this might be an issue in the analysis of this dataset.
+
+
+####do or answer the following (commenting on the results of each):
+
+Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
+
+```{r clean_ny_noaa}
+clean_ny_noaa = ny_noaa %>% 
+  janitor::clean_names() %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(prcp = prcp / 10, tmax = as.numeric(tmax) / 10, tmin = as.numeric(tmin) / 10)
+
+clean_ny_noaa %>% 
+  group_by(snow) %>% 
+  summarize(n = n()) %>% 
+  arrange(desc(n))
+```
+
+observations for temperature, precipitation, and snowfall are given in reasonable units. Temperature converted from tenths of degrees C to degrees C and precipitation converted from tenths of mm to mm.Temperature tmin and tmax are converted into nuermic variables. 
+commonly observed values for snowfall is 0, because the chance of snowing is rare. 
+
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+```{r, two-panel-plot}
+ clean_ny_noaa %>% 
+  filter(month %in% c("01","07")) %>% 
+  mutate(month = recode(month, "01" = "January", "07" = "July")) %>% 
+  group_by(year, month, id) %>% 
+  summarize(average_max = mean(tmax, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = average_max, fill = month)) +
+  geom_boxplot() +
+scale_x_discrete(breaks = c(1981, 1987, 1993, 1999, 2005, 2010))+
+  labs(
+    title = "average max temperature in January and in July in each station across years",
+    x = "year",
+    y = "average max temperature (C)",
+    caption = "Data from p8105.datasets package"
+  )  + 
+  facet_grid(~ month)+
+viridis::scale_color_viridis(
+    name = "month", 
+    discrete = TRUE)
+
+```
+
+Based on the two-panel plot, it is very obvious that the mean value of total average max tempertuare between Jan and July is different. The max tempertuare for Jan is lower than the max temperature for July from 1981 to 2010. Greater variability happened in Jan. Most years have outliers. For example, in 1988 July, there is a super low max temperature. All outliers in July are below the min of the max tempature, while for Jan, relatively more outliers are higher than the average. 
+
+Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
 
 
