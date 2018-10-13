@@ -229,6 +229,30 @@ instacart %>%
 The table shows that customers generally buy coffee ice cream later than pink lady apples. People buy coffee ice cream mostly after 2 pm except Friday, while people by pink lady apples mostly around noon except wednesday.
 
 
+## problem 3
+The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue.
+
+```{r, noaa}
+data("ny_noaa")
+
+ny_noaa %>%
+  group_by(id) %>%
+summarize(n = n())
+
+ny_noaa %>%
+  group_by(date) %>%
+summarize(n = n())
+
+
+ny_noaa %>%
+  group_by(id, date) %>%
+summarize(mean_depth = mean(snwd),
+          mean_prcp = mean (prcp))
+
+
+```
+This dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. 
+Key variables: id shows Weather station ID and there are total 747 different stations. Date shows Date of observation and total 10957 days are recorded.prcp means Precipitation (tenths of mm).snow is Snowfall (mm).snwd is Snow depth (mm) tmax gives Maximum temperature (tenths of degrees C). tmin gives Minimum temperature (tenths of degrees C). There are `r sum(is.na(ny_noaa$prcp))` missing values for the precipitation colummn and `r sum(is.na(ny_noaa$tmax))` missing values for tmax and `r sum(is.na(ny_noaa$tmin))` missing values for tmin. `r sum(is.na(ny_noaa$snow))` missing values for Snowfall (mm) and `r sum(is.na(ny_noaa$snwd))` missing values for  Snow depth (mm). A large extent of the data are missing and this might be an issue in the analysis of this dataset.
 
 
 
