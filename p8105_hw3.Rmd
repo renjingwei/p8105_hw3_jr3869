@@ -1,0 +1,45 @@
+---
+title: "P8105_hw3"
+author: "Jingwei Ren"
+date: "10/12/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(p8105.datasets)
+```
+
+##problem1
+First, do some data cleaning:
+
+format the data to use appropriate variable names;
+focus on the “Overall Health” topic
+include only responses from “Excellent” to “Poor”
+organize responses as a factor taking levels ordered from “Excellent” to “Poor”
+
+```{r}
+brfss = brfss_smart2010 %>% 
+  janitor::clean_names() %>% 
+  filter(topic == "Overall Health" & (response == "Excellent" | response == "Very good" |
+                                       response == "Good" | response == "Fair" | 
+                                       response == "Poor")) %>% 
+  mutate(response = factor(response, level = c("Excellent","Very good", "Good", "Fair", "Poor")))
+```
+
+Using this dataset, do or answer the following (commenting on the results of each):
+
+In 2002, which states were observed at 7 locations?
+```{r}
+brfss %>% 
+  filter(year == 2002) %>% 
+  group_by(locationabbr) %>% 
+  distinct(locationdesc) %>% 
+  count() %>% 
+  filter(n == 7) 
+```
+CT,FL and NC were observed at 7 locations.
+
+Make a “spaghetti plot” that shows the number of locations in each state from 2002 to 2010.
+Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.
+For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.
