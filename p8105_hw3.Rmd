@@ -162,8 +162,72 @@ There are total 134 different kinds of aisles. Among them, fresh vegetables has 
 
 Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
 
+```{r, aisle_plot}
+instacart %>% 
+  group_by(aisle) %>% 
+  summarize(n = n()) %>% 
+  mutate(aisle = reorder(aisle, desc(n))) %>% 
+  ggplot(
+       aes(x = aisle, y = n)) +
+  geom_point() +
+  labs(
+    title = "Number of items ordered in each aisle",
+    x = "aisle",
+    y = "number of items",
+    caption = "Data from p8105.datasets package"
+  )  +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+instacart %>% 
+  group_by(aisle) %>% 
+  summarize(n = n()) %>%
+  mutate(aisle = reorder(aisle, desc(n))) %>% 
+  filter(min_rank(aisle) < 20) %>% 
+   ggplot(
+       aes(x = aisle, y = n)) +
+  geom_point() +
+  labs(
+    title = "Number of items ordered in each aisle Top 20",
+    x = "aisle",
+    y = "number of items",
+    caption = "Data from p8105.datasets package"
+  )  +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+top 20 number of items ordered in each aisle is ploted. Fresh vegetables has the highest number of orders, then its fresh fruits, packages vegetables fruits and yogurt.
+
 Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
+
+```{r aisles_table}
+instacart %>% 
+  filter(aisle %in% c("baking ingredients",
+                      "dog food care", 
+                      "packaged vegetables fruits")) %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(n = n()) %>% 
+  mutate(n_ranking = min_rank(desc(n))) %>% 
+  filter(n_ranking < 2) %>% 
+  knitr::kable()
+```
+
+The most populay item in baking ingredients is light brown sugar with number of 499. The most populat item in dog food care is Snack Sticks Chicken & Rice Recipe Dog Treats with the number of 30. The most populay item in packaged vegetables fruits is Organic Baby Spinach with the number of 9784.
+
 Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
+```{r, lady_apple_coffe_ice_cream}
+instacart %>%
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
+  mutate(order_day = ordered(order_dow, levels = c(0:6), labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))) %>% 
+  group_by(product_name, order_day) %>% 
+  summarize(mean_hour = round(mean(order_hour_of_day))) %>% 
+  spread(key = order_day, value = mean_hour) %>% 
+  knitr::kable()
+
+```
+
+The table shows that customers generally buy coffee ice cream later than pink lady apples. People buy coffee ice cream mostly after 2 pm except Friday, while people by pink lady apples mostly around noon except wednesday.
+
 
 
 
